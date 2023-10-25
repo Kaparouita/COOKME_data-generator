@@ -1,8 +1,7 @@
 package domain
 
-import (
-	"github.com/Kaparouita/models"
-)
+import "github.com/Kaparouita/models/models"
+
 
 type RecipeTest struct {
 	Page struct {
@@ -31,13 +30,13 @@ type RecipeTest struct {
 	} `json:"page"`
 }
 
-func TransformRecipeTestToRecipe(recipeTest RecipeTest) *models.Recipe {
-    article := *models.Article{
+func (recipeTest *RecipeTest) TransformRecipeTestToRecipe() *models.Recipe {
+    article := &models.Article{
         Author:      recipeTest.Page.Article.Author,
         Description: recipeTest.Page.Article.Description,
     }
 
-    recipeInfo := *models.RecipeInfo{
+    recipeInfo := &models.RecipeInfo{
         CookingTime:   recipeTest.Page.Recipe.CookingTime,
         PrepTime:      recipeTest.Page.Recipe.PrepTime,
         Serves:        recipeTest.Page.Recipe.Serves,
@@ -51,7 +50,7 @@ func TransformRecipeTestToRecipe(recipeTest RecipeTest) *models.Recipe {
         PostDates:     recipeTest.Page.Recipe.PostDates,
     }
 
-    recipe := *models.Recipe{
+    recipe := &models.Recipe{
         Article:   article,
         RecipeInfo: recipeInfo,
         Title:     recipeTest.Page.Title,
