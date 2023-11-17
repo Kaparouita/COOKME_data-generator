@@ -12,17 +12,17 @@ import (
 
 type Handler struct {
 	handler *amqp.AmqpHandler
-	srv ports.GenerateService
+	srv     ports.GenerateService
 }
 
-func NewHandler(srv ports.GenerateService,handler *amqp.AmqpHandler) *Handler {
+func NewHandler(srv ports.GenerateService, handler *amqp.AmqpHandler) *Handler {
 	return &Handler{
-		srv : srv,
+		srv:     srv,
 		handler: handler,
 	}
 }
 
-func(handler *Handler) GenerateRecipes(msgs <-chan myrabbit.Delivery, pubCh myrabbit.Channel, subCh myrabbit.Channel){
+func (handler *Handler) GenerateRecipes(msgs <-chan myrabbit.Delivery, pubCh myrabbit.Channel, subCh myrabbit.Channel) {
 	for msg := range msgs {
 		func() {
 			req := &domain.Request{}
@@ -35,7 +35,7 @@ func(handler *Handler) GenerateRecipes(msgs <-chan myrabbit.Delivery, pubCh myra
 				pubCh.Respond(msg, resp)
 				return
 			}
-			recipes,err := handler.srv.GenerateRecipes()
+			recipes, err := handler.srv.GenerateRecipes()
 			if err != nil {
 				resp := &models.Response{
 					StatusCode: 500,
@@ -43,16 +43,12 @@ func(handler *Handler) GenerateRecipes(msgs <-chan myrabbit.Delivery, pubCh myra
 				pubCh.Respond(msg, resp)
 				return
 			}
-			for _,recipe := range recipes{
-				recipe.PrintRecipe()
-			}
+
 			pubCh.Respond(msg, recipes)
 		}()
 	}
 }
 
-
-
-func(handler *Handler) InitServer (){
-	handler.handler.RegisterConsumer("data-generator.generate-recipes",handler.GenerateRecipes)
+func (handler *Handler) InitServer() {
+	handler.handler.RegisterConsumer("data-generator.generate-recipes", handler.GenerateRecipes)
 }

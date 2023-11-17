@@ -2,7 +2,6 @@ package domain
 
 import "github.com/Kaparouita/models/models"
 
-
 type RecipeTest struct {
 	Page struct {
 		Article struct {
@@ -20,7 +19,7 @@ type RecipeTest struct {
 			NutritionInfo []string `json:"nutrition_info"`
 			Ingredients   []string `json:"ingredients"`
 			Courses       []string `json:"courses"`
-			Cuisine       string   `json:"cusine"` 
+			Cuisine       string   `json:"cusine"`
 			DietTypes     []string `json:"diet_types"`
 			SkillLevel    string   `json:"skill_level"`
 			PostDates     string   `json:"post_dates"`
@@ -31,30 +30,30 @@ type RecipeTest struct {
 }
 
 func (recipeTest *RecipeTest) TransformRecipeTestToRecipe() *models.Recipe {
-    article := &models.Article{
-        Author:      recipeTest.Page.Article.Author,
-        Description: recipeTest.Page.Article.Description,
-    }
+	article := &models.Article{
+		Author:      recipeTest.Page.Article.Author,
+		Description: recipeTest.Page.Article.Description,
+	}
 
-    recipeInfo := &models.RecipeInfo{
-        CookingTime:   recipeTest.Page.Recipe.CookingTime,
-        PrepTime:      recipeTest.Page.Recipe.PrepTime,
-        Serves:        recipeTest.Page.Recipe.Serves,
-        Keywords:      recipeTest.Page.Recipe.Keywords,
-        Ratings:       recipeTest.Page.Recipe.Ratings,
-        NutritionInfo: recipeTest.Page.Recipe.NutritionInfo,
-        Ingredients:   recipeTest.Page.Recipe.Ingredients,
-        Courses:       recipeTest.Page.Recipe.Courses,
-        Cuisine:       recipeTest.Page.Recipe.Cuisine,
-        SkillLevel:    recipeTest.Page.Recipe.SkillLevel,
-        PostDates:     recipeTest.Page.Recipe.PostDates,
-    }
+	recipeInfo := &models.RecipeInfo{
+		CookingTime:   recipeTest.Page.Recipe.CookingTime,
+		PrepTime:      recipeTest.Page.Recipe.PrepTime,
+		Serves:        recipeTest.Page.Recipe.Serves,
+		Keywords:      recipeTest.Page.Recipe.Keywords,
+		Ratings:       recipeTest.Page.Recipe.Ratings,
+		NutritionInfo: recipeTest.Page.Recipe.NutritionInfo,
+		Ingredients:   recipeTest.Page.Recipe.Ingredients,
+		Courses:       recipeTest.Page.Recipe.Courses,
+		Cuisine:       recipeTest.Page.Recipe.Cuisine,
+		SkillLevel:    recipeTest.Page.Recipe.SkillLevel,
+		PostDates:     recipeTest.Page.Recipe.PostDates,
+	}
 
-    recipe := &models.Recipe{
-        Article:   article,
-        RecipeInfo: recipeInfo,
-        Title:     recipeTest.Page.Title,
-    }
+	recipe := &models.Recipe{
+		Article:    article,
+		RecipeInfo: recipeInfo,
+		Title:      recipeTest.Page.Title,
+	}
 
-    return recipe
+	return recipe
 }
