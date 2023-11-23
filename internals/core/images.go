@@ -49,7 +49,7 @@ func (srv *GenerateService) GetRecipesFromJson(file string) error {
 }
 
 func (srv *GenerateService) GenerateImages(recipes []models.Recipe, index, total int) ([]models.Recipe, error) {
-	subscriptionKey := "HMhFEkxKW12eOrnD0fCmoRjrjpYhFt4De261qm1VkmWcUMordIXTOGNl"
+	subscriptionKey := "pZiZU2SOr0nnwE9VjyvFPW8qo4y6WbS2VvsQTKucJiSTRzGUob9gabzd"
 	endpoint := "https://api.pexels.com/v1/search"
 	var wg sync.WaitGroup
 	sem := semaphore.NewWeighted(10)
@@ -79,7 +79,7 @@ func (srv *GenerateService) GenerateImages(recipes []models.Recipe, index, total
 			tries := 0
 
 			fmt.Printf("Start request for recipe %d with tilte %s\n", i, recipe.Title)
-			for recipe.Image == "" || recipe.Image == "Not found" || tries < 5 {
+			for (recipe.Image == "" || recipe.Image == "Not found") && tries < 10 {
 				// Perform the Web request and get the response
 				request, err := http.NewRequest("GET", uriQuery, nil)
 				if err != nil {
@@ -101,15 +101,18 @@ func (srv *GenerateService) GenerateImages(recipes []models.Recipe, index, total
 					fmt.Println(err)
 				}
 
-				type Error struct {
+				type RespError struct {
 					Message string `json:"message"`
 					Status  int    `json:"status"`
 				}
+				respErr := RespError{}
 
-				err = json.Unmarshal(body, &Error{})
-				if err == nil {
-					fmt.Printf("Recipe %d has been rate limited, sleeping for %d seconds\n", i, 4)
-					time.Sleep(time.Duration(4) * time.Second)
+				err = json.Unmarshal(body, &respErr)
+				if err == nil && respErr.Status == 429 {
+					fmt.Printf("Recipe %d has been rate limited, sleeping for %d seconds , try number : %d\n", i, 10, tries)
+					time.Sleep(time.Duration(10) * time.Second)
+					tries++
+					continue
 				}
 				var searchResponse domain.PexelsResponse
 				err = json.Unmarshal(body, &searchResponse)
@@ -127,7 +130,6 @@ func (srv *GenerateService) GenerateImages(recipes []models.Recipe, index, total
 						}
 					}
 				}
-				tries++
 			}
 			fmt.Printf("Finish request for recipe %d found image %s\n", i, recipe.Image)
 		}(i, &recipes[i])
