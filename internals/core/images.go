@@ -17,7 +17,30 @@ import (
 	"golang.org/x/sync/semaphore"
 )
 
-func (srv *GenerateService) GetRecipesFromJson(file string) error {
+func (srv *GenerateService) GetRecipesFromJson(file string) ([]models.Recipe, error) {
+	jsonFile, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer jsonFile.Close()
+
+	var recipes []models.Recipe
+	byteValue, _ := io.ReadAll(jsonFile)
+	err = json.Unmarshal(byteValue, &recipes)
+	if err != nil {
+		return nil, err
+	}
+
+	for i := range recipes {
+		srv.db.SendToDB(&recipes[i])
+		if err != nil {
+			fmt.Println(err) // TODO: log error
+		}
+	}
+	return recipes, nil
+}
+
+func (srv *GenerateService) AddImages(file string) error {
 	jsonFile, err := os.Open(file)
 	if err != nil {
 		fmt.Println(err)
@@ -32,8 +55,8 @@ func (srv *GenerateService) GetRecipesFromJson(file string) error {
 		return fmt.Errorf("recipes is empty")
 	}
 	//0-800
-	max := 1200
-	min := 800
+	max := 1600
+	min := 1200
 
 	recipes, err = srv.GenerateImages(recipes, min, max)
 	if err != nil {

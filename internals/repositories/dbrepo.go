@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"context"
 	"data-generator/utils"
 
 	"github.com/Kaparouita/models/models"
@@ -9,20 +10,30 @@ import (
 )
 
 type DbRepo struct {
-	channel myrabbit.Channel
+	pubCh myrabbit.Channel
+	subCh myrabbit.Channel
+	msgs  <-chan myrabbit.Delivery
 }
 
 func NewDbRepo(handler *amqp.AmqpHandler) *DbRepo {
-	ch, err := handler.PubConnection.Channel() // create a new channel
+	pubCh, err := handler.PubConnection.Channel() // create a new channel
+	utils.FailOnError(err, "Failed to open a channel")
+	subCh, err := handler.SubConnection.Channel() // create a new channel
 	utils.FailOnError(err, "Failed to open a channel")
 
-	_, err = ch.QueueDeclare("kati-kati", false, false, false, false, nil)
+	_, err = pubCh.QueueDeclare("db_manager.save.recipe", false, false, false, false, nil)
 	utils.FailOnError(err, "Failed to declare a queue")
+
+	_, err = subCh.QueueDeclare("db_manager.save.recipe.rcv", false, false, false, false, nil)
+	utils.FailOnError(err, "Failed to declare a queue")
+
 	return &DbRepo{
-		channel: ch,
+		pubCh: pubCh,
+		subCh: subCh,
 	}
 }
 
-func (repo *DbRepo) SaveRecipes(recipes []models.Recipe) error {
-	return nil
+func (adapter *DbRepo) SendToDB(recipe *models.Recipe) error {
+	err := adapter.pubCh.PublishJSON(context.Background(), "", "db_manager.save.recipe", false, false, recipe, myrabbit.Publishing{})
+	return err
 }
