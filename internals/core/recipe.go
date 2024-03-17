@@ -2,11 +2,10 @@ package core
 
 import (
 	"data-generator/internals/domain"
+	"data-generator/internals/models"
 	"data-generator/internals/ports"
 	"encoding/json"
 	"os"
-
-	"github.com/Kaparouita/models/models"
 )
 
 type GenerateService struct {
@@ -19,7 +18,7 @@ func NewGenerateService(db ports.DbRepo) *GenerateService {
 	}
 }
 
-func (srv *GenerateService) GenerateRecipes() ([]models.Recipe, error) {
+func (srv *GenerateService) GenerateRecipes() ([]models.RecipeJson, error) {
 	file, err := os.Open("./recipe_raw/recipe_raw.json")
 	if err != nil {
 		return nil, err
@@ -38,20 +37,10 @@ func (srv *GenerateService) GenerateRecipes() ([]models.Recipe, error) {
 	return reformRecipeTests(recipes)
 }
 
-func reformRecipeTests(recipes []domain.RecipeTest) ([]models.Recipe, error) {
-	var reformRecipes []models.Recipe
+func reformRecipeTests(recipes []domain.RecipeTest) ([]models.RecipeJson, error) {
+	var reformRecipes []models.RecipeJson
 	for _, recipe := range recipes {
 		reformRecipes = append(reformRecipes, *recipe.TransformRecipeTestToRecipe())
 	}
 	return reformRecipes, nil
-}
-
-func ExportIngridients(recipes []models.Recipe) (map[string]string, error) {
-	ingridients := make(map[string]string)
-	for _, recipe := range recipes {
-		for _, ingridient := range recipe.RecipeInfo.Ingredients {
-			ingridients[ingridient] = ingridient
-		}
-	}
-	return ingridients, nil
 }

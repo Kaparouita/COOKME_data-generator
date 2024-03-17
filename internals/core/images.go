@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"data-generator/internals/domain"
+	"data-generator/internals/models"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -13,7 +14,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Kaparouita/models/models"
 	"golang.org/x/sync/semaphore"
 )
 
@@ -55,8 +55,8 @@ func (srv *GenerateService) AddImages(file string) error {
 		return fmt.Errorf("recipes is empty")
 	}
 	//0-800
-	max := 1600
-	min := 1200
+	max := 2000
+	min := 1800
 
 	recipes, err = srv.GenerateImages(recipes, min, max)
 	if err != nil {
@@ -72,7 +72,9 @@ func (srv *GenerateService) AddImages(file string) error {
 }
 
 func (srv *GenerateService) GenerateImages(recipes []models.Recipe, index, total int) ([]models.Recipe, error) {
-	subscriptionKey := "pZiZU2SOr0nnwE9VjyvFPW8qo4y6WbS2VvsQTKucJiSTRzGUob9gabzd"
+	subscriptionKey := "EWkK2tFqwGvl8xD3n1fdt64PLQn2lzyCcLQgkeDxyPO0EFtCsl8xcO9d"
+	// pZiZU2SOr0nnwE9VjyvFPW8qo4y6WbS2VvsQTKucJiSTRzGUob9gabzd
+	//UfVoBdoMa4rSFeOGv9x6dRBR0YNmhxMhwiB5zhTIirBJQZqak7wPvF5F
 	endpoint := "https://api.pexels.com/v1/search"
 	var wg sync.WaitGroup
 	sem := semaphore.NewWeighted(10)
