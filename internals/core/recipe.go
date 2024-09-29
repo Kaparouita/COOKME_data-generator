@@ -9,12 +9,12 @@ import (
 )
 
 type GenerateService struct {
-	db ports.DbRepo
+	Db ports.DbRepo
 }
 
 func NewGenerateService(db ports.DbRepo) *GenerateService {
 	return &GenerateService{
-		db: db,
+		Db: db,
 	}
 }
 

@@ -2,15 +2,31 @@ package main
 
 import (
 	"data-generator/internals/core"
+	"data-generator/internals/repositories"
 	"fmt"
+	"log"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-
-	srv := core.NewGenerateService(nil)
-	err := srv.AddImages("./recipes.json")
+	err := godotenv.Load()
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal("Error loading .env file")
+	}
+
+	db := repositories.NewDbRepo()
+	srv := core.NewGenerateService(db)
+	// apiKey1 := os.Getenv("PEXELS_API_KEY1")
+	apiKey2 := os.Getenv("PEXELS_API_KEY2")
+	apiKey3 := os.Getenv("PEXELS_API_KEY3")
+	apiKeys := []string{apiKey2, apiKey3}
+	for _, apiKey := range apiKeys {
+		err := srv.AddImages("", apiKey)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }
 

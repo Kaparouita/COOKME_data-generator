@@ -4,6 +4,8 @@ import "data-generator/internals/models"
 
 type DbRepo interface {
 	SendToDB(*models.Recipe) error
+	GetRecipes() ([]models.Recipe, error)
+	UpdateTitleDescription(recipe *models.Recipe) error
 }
 
 type GenerateService interface {
